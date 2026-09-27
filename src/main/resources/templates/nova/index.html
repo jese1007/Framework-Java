@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${resource.getLabel()}">Index</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <div class="w-64 bg-indigo-900 text-white p-6">
+            <h1 class="text-2xl font-bold mb-8">Java Nova</h1>
+            <a href="/nova/dashboard" class="block py-2 px-4 hover:bg-indigo-800 rounded">Dashboard</a>
+        </div>
+        <div class="flex-1 p-10">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800" th:text="${resource.getLabel()}">Resource</h2>
+                <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '/create'}" 
+                   class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Add New</a>
+            </div>
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th th:each="field : ${resource.fields()}" 
+                                class="px-6 py-3 text-sm font-semibold text-gray-600" 
+                                th:text="${field.label}">Field</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${data}" class="border-b hover:bg-gray-50 transition">
+                            <td th:each="field : ${resource.fields()}" 
+                                class="px-6 py-4 text-sm text-gray-700" 
+                                th:text="${item[field.name]}">Value</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(data)}">
+                            <td colspan="10" class="px-6 py-10 text-center text-gray-500">No records found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
