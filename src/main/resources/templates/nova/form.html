@@ -37,6 +37,12 @@
                         <div th:each="field : ${resource.fields()}" class="grid grid-cols-1 gap-2">
                             <label class="text-sm font-semibold text-gray-700 ml-1" th:text="${field.label}"></label>
 
+                            <!-- TEXT AREA input -->
+                            <textarea th:if="${field.type.name() == 'TEXT_AREA'}"
+                                      th:name="${field.name}"
+                                      th:text="${entity[field.name]}"
+                                      class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-gray-50 focus:bg-white"></textarea>
+
                             <!-- RICH TEXT EDITOR -->
                             <div th:if="${field.type.name() == 'TEXT_EDITOR'}" class="mt-1">
                                 <textarea th:name="${field.name}"
@@ -57,10 +63,10 @@
                             </div>
 
                             <!-- DEFAULT input for other types -->
-                            <input th:unless="${field.type.name() == 'TEXT_EDITOR' || field.type.name() == 'BOOLEAN'}"
+                            <input th:unless="${field.type.name() == 'TEXT_EDITOR' || field.type.name() == 'TEXT_AREA' || field.type.name() == 'BOOLEAN'}"
                                    th:name="${field.name}"
                                    th:value="${entity[field.name]}"
-                                   th:type="${field.type.name() == 'PASSWORD' ? 'password' : 'text'}"
+                                   th:type="${field.type.name() == 'PASSWORD' ? 'password' : (field.type.name() == 'NUMBER' ? 'number' : 'text')}"
                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-gray-50 focus:bg-white">
                         </div>
 
