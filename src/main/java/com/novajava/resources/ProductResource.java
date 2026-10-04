@@ -10,12 +10,11 @@ public class ProductResource extends AbstractNovaResource<Product> {
 
     @Override
     public List<NovaField> fields() {
-        // This defines exactly what appears in the Nova Admin UI
         return List.of(
-            new NovaField("name", "Product Name", NovaField.FieldType.TEXT),
-            new NovaField("price", "Unit Price", NovaField.FieldType.NUMBER),
-            new NovaField("stock", "Stock Quantity", NovaField.FieldType.NUMBER),
-            new NovaField("description", "Full Description", NovaField.FieldType.TEXT)
+            new NovaField("name", "Product Name", NovaField.FieldType.TEXT, true, true),
+            new NovaField("price", "Unit Price", NovaField.FieldType.NUMBER, true, true),
+            new NovaField("stock", "Stock Quantity", NovaField.FieldType.NUMBER, true, true),
+            new NovaField("description", "Full Description", NovaField.FieldType.TEXT_AREA, true, false)
         );
     }
 

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="'View ' + ${resource.getLabel()}">View Detail</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+        <link rel="stylesheet" th:href="@{/css/nova.css}">
+    </head>
+    <body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <div th:replace="~{nova/nav :: sidebar(activeResource=${resource.getEntityClass().getSimpleName().toLowerCase()})}"></div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- TOP NAVBAR -->
+            <header th:replace="~{nova/header :: header(pageTitle='Record Details')}"></header>
+
+            <main class="flex-1 overflow-y-auto bg-gray-50 p-6 lg:p-10">
+                <div class="mx-auto">
+
+                    <!-- Breadcrumbs & Actions -->
+                    <div class="flex justify-between items-center mb-8">
+                        <div class="flex items-center space-x-2 text-sm text-gray-500">
+                            <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()}}" class="hover:text-indigo-600 transition">
+                                <i class="fa-solid fa-folder-open mr-1"></i> [[${resource.getLabel()}]]
+                            </a>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            <span class="text-gray-800 font-medium">View Detail</span>
+                        </div>
+
+                        <div class="flex space-x-3">
+                            <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '/edit/' + ${entity.id}}"
+                               class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition flex items-center shadow-sm text-sm font-semibold">
+                                <i class="fa-solid fa-pen-to-square mr-2 text-indigo-600"></i> Edit Record
+                            </a>
+                            <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()}}"
+                               class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition flex items-center shadow-sm text-sm font-semibold">
+                                <i class="fa-solid fa-arrow-left mr-2"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Detail Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <!-- Card Header -->
+                        <div class="bg-gray-50 px-8 py-6 border-b border-gray-200 flex justify-between items-center">
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-800">Record Details</h1>
+                                <p class="text-sm text-gray-500">Viewing detailed information for ID: <span class="font-mono font-bold text-indigo-600" th:text="${entity.id}">0</span></p>
+                            </div>
+                            <div class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                Read Only
+                            </div>
+                        </div>
+
+                        <!-- Card Body: Dynamic Fields -->
+                        <div class="p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                                <div th:each="field : ${resource.fields()}" class="flex flex-col space-y-2 border-b border-gray-50 pb-4">
+                                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest" th:text="${field.label}">Field Label</label>
+                                    <div class="text-gray-800 font-medium text-lg">
+                                        <!-- Handle potentially null values -->
+                                        <span th:text="${entity[field.name] != null ? entity[field.name] : '—'}">Value</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+            <footer th:replace="~{nova/footer :: footer}"></footer>
+        </div>
+    </body>
+</html>

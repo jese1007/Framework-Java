@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nova Header</title>
+</head>
+<body>
+    <!-- TOP HEADER -->
+    <header th:fragment="header(pageTitle)" class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-8 shadow-sm z-10">
+        <div class="flex items-center space-x-3 text-gray-500">
+            <i class="fa-solid fa-bars text-lg cursor-pointer hover:text-indigo-600 transition"></i>
+            <div class="h-4 w-px bg-gray-300"></div>
+            <span class="text-sm font-semibold tracking-wide" th:text="${pageTitle}">Page Title</span>
+        </div>
+        <div class="flex items-center space-x-6">
+            <!-- Logout Link -->
+            <form th:action="@{/logout}" method="post" class="inline">
+                <button type="submit" class="flex items-center space-x-2 text-sm font-medium text-gray-500 hover:text-red-600 transition bg-transparent border-none cursor-pointer">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
+
+            <!-- New Entry Dropdown -->
+            <div class="relative group">
+                <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 font-semibold text-sm flex items-center">
+                    <i class="fa-solid fa-plus mr-2"></i> New Entry
+                    <i class="fa-solid fa-chevron-down ml-2 text-xs opacity-70"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
+                    <div class="py-1">
+                        <a th:href="@{'/nova/' + (${resource != null} ? ${resource.getEntityClass().getSimpleName().toLowerCase()} : 'dashboard') + '/create'}"
+                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                            <i class="fa-solid fa-file-circle-plus mr-3 text-gray-400 group-hover:text-indigo-500"></i>
+                            Create Quick Entry
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                            <i class="fa-solid fa-upload mr-3 text-gray-400"></i>
+                            Import from CSV
+                        </a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                            <i class="fa-solid fa-gear mr-3 text-gray-400"></i>
+                            Template Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+</body>
+</html>

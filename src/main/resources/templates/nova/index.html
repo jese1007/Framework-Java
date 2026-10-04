@@ -1,42 +1,122 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title th:text="${resource.getLabel()}">Index</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 font-sans">
-    <div class="flex h-screen">
-        <div class="w-64 bg-indigo-900 text-white p-6">
-            <h1 class="text-2xl font-bold mb-8">Java Nova</h1>
-            <a href="/nova/dashboard" class="block py-2 px-4 hover:bg-indigo-800 rounded">Dashboard</a>
-        </div>
-        <div class="flex-1 p-10">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold text-gray-800" th:text="${resource.getLabel()}">Resource</h2>
-                <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '/create'}" 
-                   class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Add New</a>
-            </div>
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th th:each="field : ${resource.fields()}" 
-                                class="px-6 py-3 text-sm font-semibold text-gray-600" 
-                                th:text="${field.label}">Field</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="item : ${data}" class="border-b hover:bg-gray-50 transition">
-                            <td th:each="field : ${resource.fields()}" 
-                                class="px-6 py-4 text-sm text-gray-700" 
-                                th:text="${item[field.name]}">Value</td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(data)}">
-                            <td colspan="10" class="px-6 py-10 text-center text-gray-500">No records found.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <head>
+        <title th:text="${resource.getLabel()}">Index</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+        <link rel="stylesheet" th:href="@{/css/nova.css}">
+    </head>
+    <body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR (Imported from nav.html) -->
+        <div th:replace="~{nova/nav :: sidebar(activeResource=${resource != null ? resource.getEntityClass().getSimpleName().toLowerCase() : 'dashboard'})}"></div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- TOP NAVBAR (Imported from header.html) -->
+            <header th:replace="~{nova/header :: header(pageTitle='System Overview')}"></header>
+
+            <main class="flex-1 overflow-y-auto bg-gray-50 p-6 lg:p-10">
+                <div class="mx-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800" th:text="${resource.getLabel()}">Resource</h2>
+                        <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '/create'}"
+                           class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center shadow-sm">
+                            <i class="fa-solid fa-plus mr-2"></i> Add New
+                        </a>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="mb-6">
+                        <form th:action="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()}}" method="get" class="flex gap-2">
+                            <div class="relative flex-1 max-w-md">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
+                                <input type="text" name="search" th:value="${search}"
+                                       placeholder="Search records..."
+                                       class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                            </div>
+                            <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition">Search</button>
+                            <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()}}"
+                               class="bg-white border px-4 py-2 rounded-lg hover:bg-gray-50 transition">Clear</a>
+                        </form>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr class="text-sm font-semibold text-gray-600">
+                                    <th th:each="field : ${resource.fields()}" class="px-6 py-4">
+                                        <div th:if="${field.sortable}" class="flex items-center justify-between cursor-pointer hover:text-indigo-600 transition">
+                                            <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} +
+                                               '?sort=' + (${sort == field.name} ? ${field.name} + ',desc' : ${field.name}) +
+                                               '&search=' + ${search} + '&page=0'}"
+                                               class="flex items-center justify-between w-full">
+                                                <span th:text="${field.label}">Field</span>
+                                                <i th:if="${sort == field.name}" class="fa-solid fa-sort-up ml-2 text-indigo-600"></i>
+                                                <i th:if="${sort == field.name + ',desc'}" class="fa-solid fa-sort-down ml-2 text-indigo-600"></i>
+                                                <i th:if="${sort != field.name && sort != field.name + ',desc'}" class="fa-solid fa-sort ml-2 text-gray-400 opacity-50"></i>
+                                            </a>
+                                        </div>
+                                        <div th:unless="${field.sortable}" class="flex items-center justify-between">
+                                            <span th:text="${field.label}">Field</span>
+                                            <i class="fa-solid fa-ban ml-2 text-xs text-gray-300"></i>
+                                        </div>
+                                    </th>
+                                    <th class="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr th:each="item : ${data}" class="border-b border-gray-100 hover:bg-gray-50 transition">
+                                    <td th:each="field : ${resource.fields()}" class="px-6 py-4 text-gray-700">
+                                        <div th:if="${field.type.name() == 'TEXT_AREA'}"
+                                             th:utext="${#strings.abbreviate(item[field.name], 100)}"
+                                             class="line-clamp-2 text-xs opacity-80"></div>
+                                        <div th:unless="${field.type.name() == 'TEXT_AREA'}"
+                                             th:text="${item[field.name]}"></div>
+                                    </td>
+                                    <td class="px-6 py-4 text-right space-x-3">
+                                        <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '/view/' + ${item.id}}"
+                                           class="text-gray-600 hover:text-indigo-600 transition inline-block p-2 hover:bg-gray-100 rounded-full" title="View">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '/edit/' + ${item.id}}"
+                                           class="text-indigo-600 hover:text-indigo-900 transition inline-block p-2 hover:bg-indigo-50 rounded-full" title="Edit">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '/delete/' + ${item.id}}"
+                                           class="text-red-600 hover:text-red-900 transition inline-block p-2 hover:bg-red-50 rounded-full"
+                                           onclick="return confirm('Are you sure?')" title="Delete">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(data)}">
+                                    <td colspan="12" class="px-6 py-20 text-center text-gray-500">
+                                        <i class="fa-solid fa-folder-open text-4xl mb-4 block opacity-20"></i>
+                                        No records found.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                            <div class="text-sm text-gray-600">
+                                Showing page <span class="font-semibold" th:text="${currentPage + 1}">1</span> of <span class="font-semibold" th:text="${totalPages}">1</span>
+                                (<span class="font-semibold" th:text="${totalItems}">0</span> items)
+                            </div>
+                            <div class="flex space-x-2">
+                                <a th:if="${currentPage > 0}"
+                                   th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '?page=' + ${currentPage - 1} + '&search=' + ${search}}"
+                                   class="px-3 py-1 border rounded bg-white hover:bg-gray-100 transition text-sm">Previous</a>
+                                <a th:if="${currentPage < totalPages - 1}"
+                                   th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '?page=' + ${currentPage + 1} + '&search=' + ${search}}"
+                                   class="px-3 py-1 border rounded bg-white hover:bg-gray-100 transition text-sm">Next</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <footer th:replace="~{nova/footer :: footer}"></footer>
         </div>
     </div>
 </body>

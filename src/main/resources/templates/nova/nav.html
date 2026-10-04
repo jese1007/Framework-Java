@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nova Navigation</title>
+</head>
+<body>
+    <!-- SIDEBAR NAVIGATION -->
+    <div th:fragment="sidebar(activeResource)"
+         class="w-64 bg-[#1e293b] text-slate-300 h-screen flex flex-col transition-all duration-300 shadow-xl z-20">
+
+        <div class="p-6 flex items-center space-x-3 border-b border-slate-700 bg-[#1a2232]">
+            <div class="bg-indigo-600 p-2 rounded-lg shadow-lg">
+                <i class="fa-solid fa-cube text-white text-xl"></i>
+            </div>
+            <span class="text-xl font-bold text-white tracking-tight">Nova Panel</span>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+            <div class="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Main Menu</div>
+            <a th:href="@{/nova/dashboard}"
+               th:classappend="${activeResource == 'dashboard'} ? 'bg-indigo-600 text-white shadow-md' : 'hover:bg-slate-800 hover:text-white'"
+               class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group">
+                <i class="fa-solid fa-house mr-3 text-lg w-5 text-center"></i>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+
+            <div class="pt-6 px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Data Management</div>
+            <a th:each="res : ${resources}"
+               th:with="resName=${res.getEntityClass().getSimpleName().toLowerCase()}"
+               th:href="@{'/nova/' + ${resName}}"
+               th:classappend="${activeResource == resName} ? 'bg-indigo-600 text-white shadow-md' : 'hover:bg-slate-800 hover:text-white'"
+               class="flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group">
+                <i class="fa-solid fa-database mr-3 text-lg w-5 text-center group-hover:text-indigo-400"></i>
+                <span class="text-sm font-medium" th:text="${res.getLabel()}">Resource</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-700 bg-slate-900/50">
+            <div class="flex items-center p-3 space-x-3 rounded-xl hover:bg-slate-800 transition cursor-pointer group">
+                <div class="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-xs">AD</div>
+                <div class="flex-1 overflow-hidden">
+                    <p class="text-sm font-semibold text-white truncate group-hover:text-indigo-300">Administrator</p>
+                    <p class="text-xs text-slate-500 truncate">admin@nova.com</p>
+                </div>
+                <a th:href="@{/logout}" class="text-slate-500 hover:text-red-400 transition">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

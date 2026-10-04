@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nova Layout</title>
+    <!-- Global Styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/nova.css}">
+
+    <!-- Global Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/nova.js}" defer></script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- MASTER LAYOUT FRAGMENT -->
+    <div th:fragment="layout(pageTitle, activeResource)" class="flex h-screen overflow-hidden">
+        <!-- NAVIGATION (Sidebar) -->
+        <div th:replace="~{nova/fragments :: sidebar(activeResource=${activeResource})}"></div>
+
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- HEADER (Top Navbar) -->
+            <header th:replace="~{nova/fragments :: header(pageTitle=${pageTitle})}"></header>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="flex-1 overflow-y-auto bg-gray-50 p-6 lg:p-10">
+                <div class="max-w-7xl mx-auto">
+                    <!-- The fix: Use a simple th:replace without the ~{this} syntax
+                         which is causing parsing errors in some Thymeleaf versions -->
+                    <div th:replace="~{this :: content}"></div>
+                </div>
+            </main>
+
+            <!-- FOOTER -->
+            <footer th:replace="~{nova/fragments :: footer}"></footer>
+        </div>
+    </div>
+
+    <!-- Slot for page-specific scripts -->
+    <th:block th:replace="~{this :: scripts}"></th:block>
+</body>
+</html>

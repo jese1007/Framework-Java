@@ -1,4 +1,4 @@
-﻿package com.novajava.core;
+package com.novajava.core;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NovaField {
     public enum FieldType {
-        TEXT, NUMBER, DATE, BOOLEAN, EMAIL, PASSWORD, TEXT_EDITOR
+        TEXT, NUMBER, DATE, BOOLEAN, EMAIL, PASSWORD, TEXT_AREA, TEXT_EDITOR
     }
 
     private String name;

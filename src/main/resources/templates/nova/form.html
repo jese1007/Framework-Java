@@ -1,86 +1,97 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title th:text="${resource.getLabel()} + ' - Form'">Nova Form</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <head>
+        <title th:text="${resource.getLabel()} + ' - Form'">Nova Form</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <!-- Quill.js Core -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+        <!-- Quill.js Core -->
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
-    <!-- Custom Nova Assets -->
-    <link rel="stylesheet" th:href="@{/css/nova.css}">
-    <script th:src="@{/js/nova.js}" defer></script>
-</head>
-<body class="bg-gray-100 font-sans">
-    <div class="flex h-screen">
-        <!-- Shared Sidebar -->
-        <div th:replace="~{nova/fragments :: sidebar(activeResource=${resource.getEntityClass().getSimpleName().toLowerCase()})}"></div>
+        <!-- Custom Nova Assets -->
+        <link rel="stylesheet" th:href="@{/css/nova.css}">
+        <script th:src="@{/js/nova.js}" defer></script>
+    </head>
+    <body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
 
-        <div class="flex-1 p-10 overflow-y-auto">
-            <div class="max-w-5xl mx-auto">
-                <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center space-x-4">
-                        <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()}}"
-                           class="text-indigo-600 hover:text-indigo-800 transition flex items-center text-sm font-medium">
-                            <i class="fa-solid fa-arrow-left mr-2"></i> Back to List
-                        </a>
-                        <h2 class="text-3xl font-extrabold text-gray-900" th:text="${resource.getLabel()}">Form</h2>
+        <!-- SIDEBAR -->
+        <div th:replace="~{nova/nav :: sidebar(activeResource=${resource.getEntityClass().getSimpleName().toLowerCase()})}"></div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- TOP NAVBAR -->
+            <header th:replace="~{nova/header :: header(pageTitle='Record Details')}"></header>
+
+            <main class="flex-1 overflow-y-auto bg-gray-50 p-6 lg:p-10">
+                <div class="mx-auto">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center space-x-2 text-sm text-gray-500">
+                            <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()}}" class="hover:text-indigo-600 transition">
+                                <i class="fa-solid fa-folder-open mr-1"></i> [[${resource.getLabel()}]]
+                            </a>
+                            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                            <span class="text-gray-800 font-medium" th:text="${entity.id != null ? 'Edit' : 'Create New'}"></span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()}}"
+                               class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition flex items-center shadow-sm text-sm font-semibold">
+                                <i class="fa-solid fa-arrow-left mr-2"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                        <form th:action="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '/save'}" method="post" class="space-y-8">
+                            <input type="hidden" name="id" th:value="${entity.id}">
+
+                            <div th:each="field : ${resource.fields()}" class="grid grid-cols-1 gap-2">
+                                <label class="text-sm font-semibold text-gray-700 ml-1" th:text="${field.label}"></label>
+
+                                <!-- TEXT AREA input -->
+                                <textarea th:if="${field.type.name() == 'TEXT_AREA'}"
+                                          th:name="${field.name}"
+                                          th:text="${entity[field.name]}"
+                                          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-gray-50 focus:bg-white"></textarea>
+
+                                <!-- RICH TEXT EDITOR -->
+                                <div th:if="${field.type.name() == 'TEXT_EDITOR'}" class="mt-1">
+                                    <textarea th:name="${field.name}"
+                                              class="rich-editor"
+                                              th:text="${entity[field.name]}"></textarea>
+                                </div>
+
+                                <!-- BOOLEAN field type -->
+                                <div th:if="${field.type.name() == 'BOOLEAN'}" class="flex items-center mt-3 ml-1">
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input th:name="${field.name}"
+                                               type="checkbox"
+                                               th:checked="${entity[field.name]}"
+                                               class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                        <span class="ml-3 text-sm font-medium text-gray-600">Enabled/Active</span>
+                                    </label>
+                                </div>
+
+                                <!-- DEFAULT input for other types -->
+                                <input th:unless="${field.type.name() == 'TEXT_EDITOR' || field.type.name() == 'TEXT_AREA' || field.type.name() == 'BOOLEAN'}"
+                                       th:name="${field.name}"
+                                       th:value="${entity[field.name]}"
+                                       th:type="${field.type.name() == 'PASSWORD' ? 'password' : (field.type.name() == 'NUMBER' ? 'number' : 'text')}"
+                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-gray-50 focus:bg-white">
+                            </div>
+
+                            <div class="flex justify-end space-x-4 pt-8 border-t border-gray-100">
+                                <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()}}"
+                                   class="px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition">Cancel</a>
+                                <button type="submit" class="bg-indigo-600 text-white px-8 py-2.5 rounded-lg hover:bg-indigo-700 transition shadow-md shadow-indigo-200 font-semibold text-sm">
+                                    Save Record
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-                    <form th:action="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()} + '/save'}" method="post" class="space-y-8">
-                        <input type="hidden" name="id" th:value="${entity.id}">
-
-                        <div th:each="field : ${resource.fields()}" class="grid grid-cols-1 gap-2">
-                            <label class="text-sm font-semibold text-gray-700 ml-1" th:text="${field.label}"></label>
-
-                            <!-- TEXT AREA input -->
-                            <textarea th:if="${field.type.name() == 'TEXT_AREA'}"
-                                      th:name="${field.name}"
-                                      th:text="${entity[field.name]}"
-                                      class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-gray-50 focus:bg-white"></textarea>
-
-                            <!-- RICH TEXT EDITOR -->
-                            <div th:if="${field.type.name() == 'TEXT_EDITOR'}" class="mt-1">
-                                <textarea th:name="${field.name}"
-                                          class="rich-editor"
-                                          th:text="${entity[field.name]}"></textarea>
-                            </div>
-
-                            <!-- BOOLEAN field type -->
-                            <div th:if="${field.type.name() == 'BOOLEAN'}" class="flex items-center mt-3 ml-1">
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input th:name="${field.name}"
-                                           type="checkbox"
-                                           th:checked="${entity[field.name]}"
-                                           class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                                    <span class="ml-3 text-sm font-medium text-gray-600">Enabled/Active</span>
-                                </label>
-                            </div>
-
-                            <!-- DEFAULT input for other types -->
-                            <input th:unless="${field.type.name() == 'TEXT_EDITOR' || field.type.name() == 'TEXT_AREA' || field.type.name() == 'BOOLEAN'}"
-                                   th:name="${field.name}"
-                                   th:value="${entity[field.name]}"
-                                   th:type="${field.type.name() == 'PASSWORD' ? 'password' : (field.type.name() == 'NUMBER' ? 'number' : 'text')}"
-                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-gray-50 focus:bg-white">
-                        </div>
-
-                        <div class="flex justify-end space-x-4 pt-8 border-t border-gray-100">
-                            <a th:href="@{'/nova/' + ${resource.getEntityClass().getSimpleName().toLowerCase()}}"
-                               class="px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition">Cancel</a>
-                            <button type="submit" class="bg-indigo-600 text-white px-8 py-2.5 rounded-lg hover:bg-indigo-700 transition shadow-md shadow-indigo-200 font-semibold text-sm">
-                                Save Record
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            </main>
         </div>
-    </div>
-</body>
+    </body>
 </html>
