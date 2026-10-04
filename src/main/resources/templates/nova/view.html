@@ -56,19 +56,19 @@
 
                         <!-- Card Body: Dynamic Fields -->
                         <div class="p-8">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                                <div th:each="field : ${resource.fields()}" class="flex flex-col space-y-2 border-b border-gray-50 pb-4">
-                                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest" th:text="${field.label}">Field Label</label>
-                                    <div class="text-gray-800 font-medium text-lg">
-                                        <!-- Handle potentially null values -->
-                                        <span th:text="${entity[field.name] != null ? entity[field.name] : '—'}">Value</span>
+                            <div class="grid grid-cols-1 md:grid-cols-1 gap-x-12 gap-y-6">
+                                <div class="grid grid-cols-2 md:grid-cols-1 gap-x-12 gap-y-6">
+                                    <div th:each="field : ${resource.fields()}" class="flex items-center border-b border-gray-100 pb-3">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-widest mr-4" th:text="${field.label}">Field Label</label>
+                                        <div class="text-gray-800 font-medium text-right">
+                                            <!-- Handle potentially null values -->
+                                            <span th:text="${entity[field.name] != null ? entity[field.name] : '—'}">Value</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                </div>
             </main>
             <footer th:replace="~{nova/footer :: footer}"></footer>
         </div>
