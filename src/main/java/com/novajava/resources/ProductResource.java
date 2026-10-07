@@ -1,5 +1,6 @@
 package com.novajava.resources;
 
+import com.novajava.model.Product;
 import com.novajava.core.AbstractNovaResource;
 import com.novajava.core.NovaField;
 import org.springframework.stereotype.Component;

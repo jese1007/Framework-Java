@@ -1,9 +1,9 @@
 package com.novajava.core;
 
-import com.novajava.resources.Product;
-import com.novajava.resources.ProductRepository;
-import com.novajava.resources.User;
-import com.novajava.resources.UserRepository;
+import com.novajava.model.Product;
+import com.novajava.repository.ProductRepository;
+import com.novajava.model.User;
+import com.novajava.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

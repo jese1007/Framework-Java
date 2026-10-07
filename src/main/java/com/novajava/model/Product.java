@@ -1,4 +1,4 @@
-package com.novajava.resources;
+package com.novajava.model;
 
 import jakarta.persistence.*;
 import lombok.*;
